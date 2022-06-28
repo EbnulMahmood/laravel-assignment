@@ -8,7 +8,7 @@
 
 
     <div class="card">
-        <form action="" method="get" class="card-header">
+        <form action="{{ route('product.search') }}" method="get" class="card-header">
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
                     <input type="text" name="title" placeholder="Product Title" class="form-control">
@@ -17,15 +17,15 @@
                     <select name="variant" id="" class="form-control">
                         <optgroup label="Color">
                         @foreach ($colorVariants as $variant)
-                            <option value="{{ $variant->id }}">{{ $variant->variant }}</option>
+                            <option value="{{ $variant->variant }}">{{ $variant->variant }}</option>
                         @endforeach
                         <optgroup label="Size">
                         @foreach ($sizeVariants as $variant)
-                            <option value="{{ $variant->id }}">{{ $variant->variant }}</option>
+                            <option value="{{ $variant->variant }}">{{ $variant->variant }}</option>
                         @endforeach
                         <optgroup label="Style">
                         @foreach ($styleVariants as $variant)
-                            <option value="{{ $variant->id }}">{{ $variant->variant }}</option>
+                            <option value="{{ $variant->variant }}">{{ $variant->variant }}</option>
                         @endforeach
                     </select>
                 </div>

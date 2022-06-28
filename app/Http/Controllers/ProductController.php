@@ -34,6 +34,41 @@ class ProductController extends Controller
         return view('products.index', compact('products', 'colorVariants', 'sizeVariants', 'styleVariants'));
     }
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function search(Request $request)
+    {
+        $num_page = 2;
+        $product_varients = ProductVariant::query()
+            ->where('variant', 'LIKE', "%{$request->variant}%")
+            ->get();
+        
+        $product_varient_prices = ProductVariantPrice::query()
+            ->whereBetween('price', [$request->price_from, $request->price_to])
+            ->get();
+        
+        $products = Product::query()
+            ->where('title', 'LIKE', "%{$request->title}%")
+            ->Where('created_at', 'LIKE', "%{$request->date}%")
+            ->orderBy('id', 'DESC')
+            ->paginate($num_page);
+        
+        $colorVariants = ProductVariant::select('variant')
+            ->where('variant_id', 1)
+            ->distinct()
+            ->get();
+        $sizeVariants = ProductVariant::select('variant')
+            ->where('variant_id', 2)
+            ->distinct()
+            ->get();
+        $styleVariants = ProductVariant::select('variant')
+            ->where('variant_id', 6)
+            ->distinct()
+            ->get();
+        return view('products.index', compact('products', 'colorVariants', 'sizeVariants', 'styleVariants'));
+    }
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
@@ -55,7 +90,8 @@ class ProductController extends Controller
         $product = new Product();
         $product->fill($request->all());
         $product->save();
-        return redirect()->back()->with('success', 'Product Saved');
+        $data = ['message' => 'Product Saved!'];
+        return response()->json($data, 200);
     }
 
 
