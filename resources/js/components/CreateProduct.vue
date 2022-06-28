@@ -90,8 +90,8 @@
                 </div>
             </div>
         </div>
-
-        <button @click="saveProduct" type="submit" class="btn btn-lg btn-primary">Save</button>
+        <button v-if="is_editing == true" @click="editProduct(product)" type="submit" class="btn btn-lg btn-primary">Edit</button>
+        <button v-else @click="saveProduct" type="submit" class="btn btn-lg btn-primary">Save</button>
         <button type="button" class="btn btn-secondary btn-lg">Cancel</button>
     </section>
 </template>
@@ -110,7 +110,10 @@ export default {
         variants: {
             type: Array,
             required: true
-        }
+        },
+        product: {
+            required: false
+        },
     },
     data() {
         return {
@@ -118,6 +121,8 @@ export default {
             product_sku: '',
             description: '',
             images: [],
+            temp_id: null,
+            is_editing: false,
             product_variant: [
                 {
                     option: this.variants[0].id,
@@ -129,7 +134,10 @@ export default {
                 url: 'https://httpbin.org/post',
                 thumbnailWidth: 150,
                 maxFilesize: 0.5,
-                headers: {"My-Awesome-Header": "header value"}
+                headers: {
+                    "X-CSRF-TOKEN": document.head.querySelector("[name=csrf-token]").content
+                    // "My-Awesome-Header": "header value"
+                    }
             }
         }
     },
@@ -188,8 +196,21 @@ export default {
                 product_variant_prices: this.product_variant_prices
             }
 
-
             axios.post('/product', product).then(response => {
+                console.log(response.data);
+            }).catch(error => {
+                console.log(error);
+            })
+
+            console.log(product);
+        },
+
+        editProduct(product) {
+            this.product_name = product.title;
+            this.temp_id = product.id;
+            this.is_editing = true;
+
+            axios.put('/product', product).then(response => {
                 console.log(response.data);
             }).catch(error => {
                 console.log(error);

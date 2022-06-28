@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('content')
+@section('content') 
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">New Product Variant</h1>
         <a href="{{ route('product-variant.index') }}" class="float-right btn btn-primary">+ All Variant</a>

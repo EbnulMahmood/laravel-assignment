@@ -17,9 +17,22 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return view('products.index');
+        $num_page = 2;
+        $products = Product::paginate($num_page);
+        $colorVariants = ProductVariant::select('variant')
+            ->where('variant_id', 1)
+            ->distinct()
+            ->get();
+        $sizeVariants = ProductVariant::select('variant')
+            ->where('variant_id', 2)
+            ->distinct()
+            ->get();
+        $styleVariants = ProductVariant::select('variant')
+            ->where('variant_id', 6)
+            ->distinct()
+            ->get();
+        return view('products.index', compact('products', 'colorVariants', 'sizeVariants', 'styleVariants'));
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -39,7 +52,10 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-
+        $product = new Product();
+        $product->fill($request->all());
+        $product->save();
+        return redirect()->back()->with('success', 'Product Saved');
     }
 
 
@@ -51,7 +67,7 @@ class ProductController extends Controller
      */
     public function show($product)
     {
-
+        return view('products.show',compact('product'));   
     }
 
     /**
@@ -63,7 +79,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $variants = Variant::all();
-        return view('products.edit', compact('variants'));
+        return view('products.edit', compact('variants', 'product'));
     }
 
     /**
@@ -75,7 +91,10 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        $product->update($request->all());
+    
+        return redirect()->route('products.index')
+                        ->with('success','Product updated successfully');
     }
 
     /**
@@ -86,6 +105,9 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+    
+        return redirect()->route('products.index')
+                        ->with('success','Product deleted successfully');
     }
 }

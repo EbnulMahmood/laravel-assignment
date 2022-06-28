@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Product;
 
 class HomeController extends Controller
 {
@@ -24,8 +23,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $num_page = 2;
-        $products = Product::paginate($num_page);
-        return view('home', compact('products'));
+        return view('home');
     }
 }

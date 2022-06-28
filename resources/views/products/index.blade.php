@@ -15,7 +15,18 @@
                 </div>
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
-
+                        <optgroup label="Color">
+                        @foreach ($colorVariants as $variant)
+                            <option value="{{ $variant->id }}">{{ $variant->variant }}</option>
+                        @endforeach
+                        <optgroup label="Size">
+                        @foreach ($sizeVariants as $variant)
+                            <option value="{{ $variant->id }}">{{ $variant->variant }}</option>
+                        @endforeach
+                        <optgroup label="Style">
+                        @foreach ($styleVariants as $variant)
+                            <option value="{{ $variant->id }}">{{ $variant->variant }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -51,21 +62,48 @@
                     </thead>
 
                     <tbody>
-
+                    @foreach($products as $key => $product)
                     <tr>
-                        <td>1</td>
-                        <td>T-Shirt <br> Created at : 25-Aug-2020</td>
-                        <td>Quality product in low cost</td>
+                        <td>{{ $key+1 }}</td>
+                        <td>{{ $product->title }} <br> Created at : {{ $product->created_at->diffForHumans() }}</td>
+                        <td>{{ $product->description }}</td>
                         <td>
+                            @php
+                                $variants = DB::table('product_variants')
+                                    ->where('product_id', $product->id)
+                                    ->orderBy('variant', 'ASC')
+                                    ->get();
+            
+                                $product_variant_prices = DB::table('product_variant_prices')
+                                    ->where('product_id', $product->id)
+                                    ->get();
+                            @endphp
                             <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
 
                                 <dt class="col-sm-3 pb-0">
-                                    SM/ Red/ V-Nick
+                                    @foreach($product_variant_prices as $variant_price)
+                                        @php
+                                            $variantOne = App\Models\ProductVariant::find($variant_price->product_variant_one);
+                                            $variantTwo = App\Models\ProductVariant::find($variant_price->product_variant_two);
+                                            $variantThree = App\Models\ProductVariant::find($variant_price->product_variant_three);
+                                        @endphp
+                                        {{ $variantOne->variant }}\ 
+                                        {{ $variantTwo->variant }}\ 
+                                        {{ $variantThree ? $variantThree->variant : '' }}
+                                    @endforeach
                                 </dt>
                                 <dd class="col-sm-9">
                                     <dl class="row mb-0">
-                                        <dt class="col-sm-4 pb-0">Price : {{ number_format(200,2) }}</dt>
-                                        <dd class="col-sm-8 pb-0">InStock : {{ number_format(50,2) }}</dd>
+                                        <dt class="col-sm-4 pb-0">
+                                            @foreach($product_variant_prices as $variant_price)
+                                                Price : {{ number_format($variant_price->price,2) }}
+                                            @endforeach
+                                        </dt>
+                                        <dd class="col-sm-8 pb-0">
+                                            @foreach($product_variant_prices as $variant_price)
+                                                InStock : {{ number_format($variant_price->stock,2) }}
+                                            @endforeach
+                                        </dd>
                                     </dl>
                                 </dd>
                             </dl>
@@ -73,11 +111,11 @@
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ route('product.edit', 1) }}" class="btn btn-success">Edit</a>
+                                <a href="{{ route('product.edit', $product) }}" class="btn btn-success">Edit</a>
                             </div>
                         </td>
                     </tr>
-
+                    @endforeach
                     </tbody>
 
                 </table>
@@ -88,10 +126,11 @@
         <div class="card-footer">
             <div class="row justify-content-between">
                 <div class="col-md-6">
-                    <p>Showing 1 to 10 out of 100</p>
+                    <p>Showing {{ $products->firstItem() }} to {{ $products->lastItem() }}
+                        out of {{$products->total()}} entries</p>
                 </div>
                 <div class="col-md-2">
-
+                    {{ $products->links() }}
                 </div>
             </div>
         </div>
